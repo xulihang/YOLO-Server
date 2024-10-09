@@ -18,12 +18,8 @@ def detect():
     image = json["image"]
     bytes_decoded = base64.b64decode(image)
     net_img = Image.open(BytesIO(bytes_decoded))
-    print(net_img.width)
-    print(net_img.height)
-    print(dir(net_img))
     
-    
-    prediction = model.predict(source=net_img)[0]
+    prediction = model.predict(source=net_img, conf=0.5)[0]
     ret = {}
     results = []
     for box in prediction.boxes:
@@ -39,7 +35,6 @@ def detect():
         
         results.append({"location":location})
     ret["results"] = results
-    print(ret)
     return ret
 
 
