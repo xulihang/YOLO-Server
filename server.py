@@ -22,18 +22,32 @@ def detect():
     prediction = model.predict(source=net_img, conf=0.5)[0]
     ret = {}
     results = []
-    for box in prediction.boxes:
-        x_center,y_center,w,h = box.xywh[0].tolist()
-        x = x_center - 0.5*w
-        y = y_center - 0.5*h
-        location = {
-          "left":x,
-          "top":y,
-          "width":w,
-          "height":h,
-        }
-        
-        results.append({"location":location})
+    if prediction.boxes != None:
+        for box in prediction.boxes:
+            x_center,y_center,w,h = box.xywh[0].tolist()
+            x = x_center - 0.5*w
+            y = y_center - 0.5*h
+            location = {
+              "left":x,
+              "top":y,
+              "width":w,
+              "height":h,
+            }
+            results.append({"location":location})
+            
+    elif prediction.obb != None:
+        for obb in prediction.obb:
+            x_center,y_center,w,h,r = obb.xywhr[0].tolist()
+            x = x_center - 0.5*w
+            y = y_center - 0.5*h
+            location = {
+              "left":x,
+              "top":y,
+              "width":w,
+              "height":h,
+              "rotation":r,
+            }
+            results.append({"location":location})
     ret["results"] = results
     return ret
 
@@ -42,6 +56,6 @@ def detect():
 def server_static(filepath):
     return static_file(filepath, root='www')
     
-model = YOLO("yolo11n.pt")
+model = YOLO("yolo11n-obb.pt")
 
 run(server="paste",host='127.0.0.1', port=8085)     
