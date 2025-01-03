@@ -24,6 +24,8 @@ def detect():
     results = []
     if prediction.boxes != None:
         for box in prediction.boxes:
+            cls = int(box.cls)
+            class_name = model.names[cls]
             x_center,y_center,w,h = box.xywh[0].tolist()
             x = x_center - 0.5*w
             y = y_center - 0.5*h
@@ -32,6 +34,7 @@ def detect():
               "top":y,
               "width":w,
               "height":h,
+              "className":class_name
             }
             results.append({"location":location})
             
@@ -46,6 +49,7 @@ def detect():
               "width":w,
               "height":h,
               "rotation":r,
+              "className":class_name
             }
             results.append({"location":location})
     ret["results"] = results
@@ -56,6 +60,7 @@ def detect():
 def server_static(filepath):
     return static_file(filepath, root='www')
     
-model = YOLO("yolo11n-obb.pt")
+model = YOLO("yolo11n.pt")
+print(model.names)
 
 run(server="paste",host='127.0.0.1', port=8085)     
